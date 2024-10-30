@@ -2,25 +2,17 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
-type templateData struct {
-	Nome string
-}
-
 func main() {
-	t, err := template.ParseFiles("layout.html", "layout2.html", "header.html", "footer.html")
+	err := godotenv.Load("../../.env")
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
-	fmt.Println(t.Name())
-	// fmt.Println(t.DefinedTemplates())
-
-	// data := templateData{Nome: "gui"}
-	err = t.ExecuteTemplate(os.Stdout, "layout2.html", "2024")
-	if err != nil {
-		panic(err)
-	}
+	port := os.Getenv("PORT")
+	host := os.Getenv("HOST")
+	fmt.Printf("%s:%s", host, port)
 }
