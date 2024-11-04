@@ -80,8 +80,9 @@ func noteCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	config := LoadConfig()
 	mux := http.NewServeMux()
-
+	fmt.Printf("%s", config.ServerPort)
 	staticHandler := http.FileServer(http.Dir("../../views/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
@@ -91,6 +92,6 @@ func main() {
 	mux.HandleFunc("/note/view", noteView)
 	mux.HandleFunc("/note/create", noteCreate)
 
-	http.ListenAndServe(":8000", mux)
+	http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux)
 
 }
