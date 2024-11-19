@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	ServerPort string `env:"SERVER_PORT,8000"`
-	Password   string `env:"PASSWORD,required"`
+	ServerPort string `env:"SERVER_PORT,9000"`
+	Password   string `env:"PASSWORD,111"`
+	Teste      string `env:"TESTE,teste"`
 }
 
 func (c Config) SPrint() (envs string) {
@@ -38,13 +39,20 @@ func (c Config) LoadFromEnv() (conf Config) {
 		envTag := strings.Split(field.Tag.Get("env"), ",")
 
 		envName := envTag[0]
+		defaultValue := envTag[1]
 		value := os.Getenv(envName)
-		f := reflect.ValueOf(&conf).Elem().FieldByName(field.Name)
-		f.SetString(value)
+		if value == "" && value != "required" {
+			f := reflect.ValueOf(&conf).Elem().FieldByName(field.Name)
+			f.SetString(defaultValue)
+		} else {
+			f := reflect.ValueOf(&conf).Elem().FieldByName(field.Name)
+			f.SetString(value)
+		}
+
 	}
 	return
 }
-func (c Config) Vslidade() {
+func (c Config) Validade() {
 	var validadeMsg string
 	v := reflect.ValueOf(c)
 	t := v.Type()
@@ -74,7 +82,7 @@ func LoadConfig() Config {
 	}
 	config := Config{}
 	config = config.LoadFromEnv()
-	config.Vslidade()
+	config.Validade()
 	// config.ServerPort = os.Getenv("SERVER_PORT")
 
 	// fmt.Println(config.SPrint()

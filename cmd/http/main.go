@@ -82,7 +82,10 @@ func noteCreate(w http.ResponseWriter, r *http.Request) {
 func main() {
 	config := LoadConfig()
 	mux := http.NewServeMux()
-	fmt.Printf("deu bom porta %s", config.ServerPort)
+	fmt.Printf("deu bom porta %s\n", config.ServerPort)
+	fmt.Printf("senha %s\n", config.Password)
+	fmt.Printf("teste %s\n", config.Teste)
+
 	staticHandler := http.FileServer(http.Dir("../../views/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
