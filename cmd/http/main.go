@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func noteList(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +26,7 @@ func noteList(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	slog.Info("execute /")
 
 	t.ExecuteTemplate(w, "base", nil)
 
@@ -81,10 +84,12 @@ func noteCreate(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	config := LoadConfig()
+
+	slog.SetDefault(newLogger(os.Stderr, config.GetLevelLog()))
 	mux := http.NewServeMux()
-	fmt.Printf("deu bom porta %s\n", config.ServerPort)
-	fmt.Printf("senha %s\n", config.Password)
-	fmt.Printf("teste %s\n", config.Teste)
+	slog.Info(fmt.Sprintf("Senha: %s", config.Password))
+	slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
+	slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
 
 	staticHandler := http.FileServer(http.Dir("../../views/static"))
 

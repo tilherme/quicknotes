@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"reflect"
 	"strings"
@@ -13,6 +14,22 @@ type Config struct {
 	ServerPort string `env:"SERVER_PORT,9000"`
 	Password   string `env:"PASSWORD,111"`
 	Teste      string `env:"TESTE,teste"`
+	LevelLog   string `env:"LEVEL_LOG,info"`
+}
+
+func (c Config) GetLevelLog() slog.Level {
+	switch strings.ToLower(c.LevelLog) {
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
 }
 
 func (c Config) SPrint() (envs string) {
