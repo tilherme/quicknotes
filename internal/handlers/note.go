@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"text/template"
+
+	"gitgub.com/tilherme/quicknotes/internal/customerror"
 )
 
 type noteHandle struct{}
@@ -55,11 +58,14 @@ func (nh *noteHandle) NoteNew(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (nh *noteHandle) NoteView(w http.ResponseWriter, r *http.Request) {
+func (nh *noteHandle) NoteView(w http.ResponseWriter, r *http.Request) error {
 	id := r.URL.Query().Get("id")
+
 	if id == "" {
-		http.Error(w, "Nota não encontrada", http.StatusNotFound)
-		return
+		return customerror.WithStatus(errors.New("anotação é obrigatoria"), http.StatusBadRequest)
+	}
+	if id == "0" {
+		return customerror.WithStatus(errors.New("anotação 0 não encontrada"), http.StatusNotFound)
 	}
 
 	files := []string{
@@ -68,10 +74,9 @@ func (nh *noteHandle) NoteView(w http.ResponseWriter, r *http.Request) {
 	}
 	t, err := template.ParseFiles(files...)
 	if err != nil {
-		http.Error(w, "Erro: "+err.Error(), http.StatusInternalServerError)
-		return
+		return errors.New("aconteceu um erro ao executar essa pagina")
 	}
-	t.ExecuteTemplate(w, "base", id)
+	return t.ExecuteTemplate(w, "base", id)
 
 }
 

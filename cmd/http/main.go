@@ -14,9 +14,9 @@ func main() {
 
 	slog.SetDefault(newLogger(os.Stderr, config.GetLevelLog()))
 	mux := http.NewServeMux()
-	slog.Info(fmt.Sprintf("Senha: %s", config.Password))
-	slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
-	slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
+	// slog.Info(fmt.Sprintf("Senha: %s", config.Password))
+	// slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
+	// slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
 
 	staticHandler := http.FileServer(http.Dir("../../views/static"))
 
@@ -24,9 +24,11 @@ func main() {
 	noteHandle := handlers.NewNoteHandle()
 	mux.HandleFunc("/", noteHandle.NoteList)
 	mux.HandleFunc("/note/new", noteHandle.NoteNew)
-	mux.HandleFunc("/note/view", noteHandle.NoteNew)
+	mux.Handle("/note/view", handlers.HandleWithError(noteHandle.NoteView))
 	mux.HandleFunc("/note/create", noteHandle.NoteCreate)
 
-	http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux)
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux); err != nil {
+		panic(err)
+	}
 
 }
