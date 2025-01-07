@@ -19,9 +19,10 @@ func main() {
 
 	defer conn.Close(context.Background())
 	fmt.Println("Conecxão feita com sucesso!!! ", conn)
-	insertPostWithReturn(conn)
-	createTable(conn)
+	// insertPostWithReturn(conn)
+	// createTable(conn)
 	// insertPost(conn)
+	selectById(conn)
 }
 
 func createTable(conn *pgx.Conn) {
@@ -74,5 +75,24 @@ func insertPostWithReturn(conn *pgx.Conn) {
 		panic(err)
 	}
 	fmt.Println("post insert id= ", id)
+
+}
+
+func selectById(conn *pgx.Conn) {
+	id := 9
+	var title, content, author string
+	query := `
+	select title, content, author from posts where id = $1;
+	`
+	row := conn.QueryRow(context.Background(), query, id)
+	err := row.Scan(&title, &content, &author)
+	if err == pgx.ErrNoRows {
+		fmt.Println("Post not found for id", id)
+		return
+	}
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("post title= %s content= %s author= %s ", title, content, author)
 
 }
