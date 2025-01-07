@@ -22,7 +22,15 @@ func main() {
 	// insertPostWithReturn(conn)
 	// createTable(conn)
 	// insertPost(conn)
-	selectById(conn)
+	// selectById(conn)
+	selectPostsAll(conn)
+}
+
+type Post struct {
+	id      int
+	title   string
+	content string
+	author  string
 }
 
 func createTable(conn *pgx.Conn) {
@@ -95,4 +103,31 @@ func selectById(conn *pgx.Conn) {
 	}
 	fmt.Printf("post title= %s content= %s author= %s ", title, content, author)
 
+}
+
+func selectPostsAll(conn *pgx.Conn) {
+	query := "select * from posts"
+	rows, err := conn.Query(context.Background(), query)
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+
+	if rows.Err() != nil {
+		panic(rows.Err())
+	}
+	var posts []Post
+
+	for rows.Next() {
+		var post Post
+		err := rows.Scan(&post.id, &post.title, &post.content, &post.author)
+		if err != nil {
+			panic(err)
+		}
+		posts = append(posts, post)
+	}
+	for _, post := range posts {
+		fmt.Println(post)
+	}
 }
