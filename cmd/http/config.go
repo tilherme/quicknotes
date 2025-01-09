@@ -12,8 +12,7 @@ import (
 
 type Config struct {
 	ServerPort string `env:"SERVER_PORT,9000"`
-	Password   string `env:"PASSWORD,111"`
-	Teste      string `env:"TESTE,teste"`
+	DBURL      string `env:"DB_URL,DB_URL"`
 	LevelLog   string `env:"LEVEL_LOG,info"`
 }
 
