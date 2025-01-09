@@ -15,7 +15,8 @@ func main() {
 	config := LoadConfig()
 
 	slog.SetDefault(newLogger(os.Stderr, config.GetLevelLog()))
-	dbpool, err := pgxpool.New(context.Background(), config.DBURL)
+	fmt.Println(config.DbConnUrl, "99999999999999999999")
+	dbpool, err := pgxpool.New(context.Background(), "postgres://postgres:secret@localhost:5432/postgres")
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
