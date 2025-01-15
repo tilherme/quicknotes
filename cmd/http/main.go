@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"gitgub.com/tilherme/quicknotes/internal/handlers"
+	"gitgub.com/tilherme/quicknotes/internal/repositories"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -28,7 +29,12 @@ func main() {
 	// slog.Info(fmt.Sprintf("Senha: %s", config.Password))
 	// slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
 	// slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
-
+	noteRepo := repositories.NewNote(dbpool)
+	notes, err := noteRepo.List()
+	if err != nil {
+		slog.Error(err.Error())
+	}
+	fmt.Println(notes)
 	staticHandler := http.FileServer(http.Dir("../../views/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
