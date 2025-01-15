@@ -30,7 +30,7 @@ func main() {
 	// slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
 	// slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
 	noteRepo := repositories.NewNote(dbpool)
-	notes, err := noteRepo.List()
+	notes, err := noteRepo.GetById(1)
 	if err != nil {
 		slog.Error(err.Error())
 	}
