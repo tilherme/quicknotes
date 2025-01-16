@@ -29,12 +29,16 @@ func main() {
 	// slog.Info(fmt.Sprintf("Senha: %s", config.Password))
 	// slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
 	// slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
+	// notes, err := noteRepo.List()
+	// notes, err := noteRepo.GetById(2)
+
 	noteRepo := repositories.NewNote(dbpool)
-	notes, err := noteRepo.GetById(1)
+	err = noteRepo.Delete(4)
+
 	if err != nil {
 		slog.Error(err.Error())
 	}
-	fmt.Println(notes)
+	fmt.Println("Nota deletada")
 	staticHandler := http.FileServer(http.Dir("../../views/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
