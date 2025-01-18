@@ -33,16 +33,11 @@ func main() {
 	// notes, err := noteRepo.GetById(2)
 
 	noteRepo := repositories.NewNote(dbpool)
-	err = noteRepo.Delete(4)
-
-	if err != nil {
-		slog.Error(err.Error())
-	}
-	fmt.Println("Nota deletada")
-	staticHandler := http.FileServer(http.Dir("../../views/static"))
+	staticHandler := http.FileServer(http.Dir("views/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
-	noteHandle := handlers.NewNoteHandle()
+	noteHandle := handlers.NewNoteHandle(noteRepo)
+
 	mux.HandleFunc("/", noteHandle.NoteList)
 	mux.HandleFunc("/note/new", noteHandle.NoteNew)
 	mux.Handle("/note/view", handlers.HandleWithError(noteHandle.NoteView))
