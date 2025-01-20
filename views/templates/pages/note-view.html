@@ -1,8 +1,8 @@
-{{ define "title"}}Visualização da nota {{ . }}{{ end }}
+{{ define "title"}}Visualização da nota {{ .Id }}{{ end }}
 
 {{define "main" }}
 <div>
-    <h3>Esta é a nota {{ . }}</h3>
-    <p>Este é o conteúdo da anotação</p>
+    <h3>Esta é a nota {{ .Title }}</h3>
+    <p>{{.Content}}</p>
 </div>
 {{ end }}

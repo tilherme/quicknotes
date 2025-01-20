@@ -1,6 +1,12 @@
 {{ define "title" }}Home Page{{end}}
 
 {{ define "main" }}
-<h1>Últimas anotações</h1>
-<p>Nenhuma anotação foi criada ainda! Que tal criar uma?</p>
+{{if eq (len .) 0}}
+    <p>Nenhum relatorio foi criada ainda! Que tal criar uma?</p>
+{{end}}
+{{range .}}
+<ul>
+    <li>{{.Title}} - {{.Content}}</li> 
+</ul>
+{{end}}
 {{ end }}

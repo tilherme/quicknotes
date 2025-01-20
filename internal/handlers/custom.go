@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"text/template"
 
@@ -21,6 +22,7 @@ func (f HandleWithError) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				t, err := template.ParseFiles(files...)
 				if err != nil {
+					fmt.Println("AQUI")
 					http.Error(w, err.Error(), statusErr.StatusCode())
 				}
 				t.ExecuteTemplate(w, "base", statusErr.Error())
