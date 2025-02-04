@@ -4,9 +4,28 @@
 {{if eq (len .) 0}}
     <p>Nenhum relatorio foi criada ainda! Que tal criar uma?</p>
 {{end}}
-{{range .}}
-<ul>
-    <li>{{.Title}} - {{.Content}}</li> 
-</ul>
+<div class="notes-container">
+    {{range .}}
+    <div id={{.Id}} class="note">
+        <p class="title"> {{.Title}}</p>
+        <div class="content">{{.Content}}</div>
+        <div class="footer">
+            <a href="#">Deletar</a>
+        </div>
+    </div>
+
 {{end}}
+</div>
+
 {{ end }}
+
+{{define "script"}}
+
+<script>
+
+    $(".note").click(function() {
+        const id = $(this).attr('id')
+        window.location.href = "note/view?id=" + id
+    });
+</script>
+{{end}}

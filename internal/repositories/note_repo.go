@@ -11,11 +11,11 @@ import (
 )
 
 type NoteRepo interface {
-	List() ([]models.Note, error)
-	GetById(id int) (*models.Note, error)
-	Create(title, content, color string) (*models.Note, error)
-	Update(id int, title, content, color string) (*models.Note, error)
-	Delete(id int) error
+	List(ctx context.Context) ([]models.Note, error)
+	GetById(ctx context.Context, id int) (*models.Note, error)
+	Create(ctx context.Context, title, content, color string) (*models.Note, error)
+	Update(ctx context.Context, id int, title, content, color string) (*models.Note, error)
+	Delete(ctx context.Context, id int) error
 }
 
 func NewNote(dbpool *pgxpool.Pool) NoteRepo {
@@ -26,9 +26,9 @@ type noteRepo struct {
 	db *pgxpool.Pool
 }
 
-func (nr *noteRepo) List() ([]models.Note, error) {
+func (nr *noteRepo) List(ctx context.Context) ([]models.Note, error) {
 	var list []models.Note
-	rows, err := nr.db.Query(context.Background(), "select * from notes")
+	rows, err := nr.db.Query(ctx, "select * from notes")
 	if err != nil {
 		return list, newRepoErro(err)
 	}
@@ -45,10 +45,10 @@ func (nr *noteRepo) List() ([]models.Note, error) {
 	return list, nil
 }
 
-func (nr *noteRepo) GetById(id int) (*models.Note, error) {
+func (nr *noteRepo) GetById(ctx context.Context, id int) (*models.Note, error) {
 	var note models.Note
 
-	row := nr.db.QueryRow(context.Background(),
+	row := nr.db.QueryRow(ctx,
 		`select * from notes where id = $1`, id)
 	if err := row.Scan(&note.Id, &note.Title, &note.Content, &note.Color, &note.Created_at, &note.Updated_at); err != nil {
 		return &note, newRepoErro(err)
@@ -57,7 +57,7 @@ func (nr *noteRepo) GetById(id int) (*models.Note, error) {
 	return &note, nil
 }
 
-func (nr *noteRepo) Create(title, content, color string) (*models.Note, error) {
+func (nr *noteRepo) Create(ctx context.Context, title, content, color string) (*models.Note, error) {
 	var note models.Note
 	note.Title = pgtype.Text{String: title, Valid: true}
 	note.Content = pgtype.Text{String: content, Valid: true}
@@ -65,14 +65,14 @@ func (nr *noteRepo) Create(title, content, color string) (*models.Note, error) {
 	query := `INSERT INTO notes(title, content, color)
 	VALUES($1, $2, $3)
 	RETURNING id, created_at`
-	row := nr.db.QueryRow(context.Background(), query, title, content, color)
+	row := nr.db.QueryRow(ctx, query, title, content, color)
 	if err := row.Scan(&note.Id, &note.Created_at); err != nil {
 		return &note, newRepoErro(err)
 	}
 	return &note, nil
 }
 
-func (nr *noteRepo) Update(id int, title, content, color string) (*models.Note, error) {
+func (nr *noteRepo) Update(ctx context.Context, id int, title, content, color string) (*models.Note, error) {
 	var note models.Note
 	note.Id = pgtype.Numeric{Int: big.NewInt(int64(id)), Valid: true}
 	if len(title) > 0 {
@@ -87,15 +87,15 @@ func (nr *noteRepo) Update(id int, title, content, color string) (*models.Note, 
 	note.Updated_at = pgtype.Date{Time: time.Now(), Valid: true}
 	query := `UPDATE notes set title = $1 ,content = COALESCE($2, content), color = $3, updated_at = $4 where id = $5`
 
-	_, err := nr.db.Exec(context.Background(), query, title, content, color, note.Updated_at, note.Id)
+	_, err := nr.db.Exec(ctx, query, title, content, color, note.Updated_at, note.Id)
 	if err != nil {
 		return &note, newRepoErro(err)
 	}
 	return &note, nil
 }
 
-func (nr *noteRepo) Delete(id int) error {
-	_, err := nr.db.Exec(context.Background(), "DELETE FROM notes where id = $1;", id)
+func (nr *noteRepo) Delete(ctx context.Context, id int) error {
+	_, err := nr.db.Exec(ctx, "DELETE FROM notes where id = $1;", id)
 	if err != nil {
 		return newRepoErro(err)
 	}

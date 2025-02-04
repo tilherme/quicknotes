@@ -39,7 +39,7 @@ func (nh *noteHandle) NoteList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	notes, err := nh.repo.List()
+	notes, err := nh.repo.List(r.Context())
 
 	if err != nil {
 		fmt.Println(err)
@@ -50,10 +50,6 @@ func (nh *noteHandle) NoteList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (nh *noteHandle) NoteNew(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "text/html;charset=utf-8") // setando para json
-	// w.Header().Add("Teste", "teste")                   // add um cabeçalho
-	// w.Header()["Date"] = nil                           // remover esse cabeçalho"
-	// w.Header().Del("Teste"])
 	files := []string{
 		"./views/templates/base.html",
 		"./views/templates/pages/note-new.html",
@@ -86,7 +82,9 @@ func (nh *noteHandle) NoteView(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return errors.New("aconteceu um erro ao executar essa pagina")
 	}
-	note, err := nh.repo.GetById(id)
+	// ctx, cancel := context.WithTimeout(r.Context(), time.Millisecond)
+	// defer cancel()
+	note, err := nh.repo.GetById(r.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -105,8 +103,20 @@ func (nh *noteHandle) NoteCreate(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Allow", http.MethodPost)
 		// w.WriteHeader(405) //  só pode ser chamado 1 vez por request
 		// fmt.Fprint(w, "Metodo não permitido") // opcional o corpo pode ir vazio
+		// errors.New("deu ruim")
 		http.Error(w, "Metodo não permitido", http.StatusMethodNotAllowed) // substitui a mensagem e o code
-		return                                                             // importante retornar a request caso contrario go vai tentar escrever a resposta
 	}
-	fmt.Fprint(w, "Criando uma nota")
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println(err)
+	}
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	color := r.PostForm.Get("color")
+
+	note, err := nh.repo.Create(r.Context(), title, content, color)
+	if err != nil {
+		panic(err)
+	}
+	http.Redirect(w, r, fmt.Sprintf("/note/view?id=%d", note.Id.Int), http.StatusSeeOther)
 }
