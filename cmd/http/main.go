@@ -26,12 +26,6 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// slog.Info(fmt.Sprintf("Senha: %s", config.Password))
-	// slog.Info(fmt.Sprintf("deu bom porta %s\n", config.ServerPort))
-	// slog.Info(fmt.Sprintf("teste %s\n", config.Teste))
-	// notes, err := noteRepo.List()
-	// notes, err := noteRepo.GetById(2)
-
 	noteRepo := repositories.NewNote(dbpool)
 	staticHandler := http.FileServer(http.Dir("views/static"))
 
