@@ -59,7 +59,7 @@ func (nh *noteHandle) NoteNew(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	t.ExecuteTemplate(w, "base", nil)
+	t.ExecuteTemplate(w, "base", newRequestNote())
 
 }
 
