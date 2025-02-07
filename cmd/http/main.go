@@ -35,6 +35,8 @@ func main() {
 	mux.HandleFunc("/", noteHandle.NoteList)
 	mux.HandleFunc("/note/new", noteHandle.NoteNew)
 	mux.Handle("/note/view", handlers.HandleWithError(noteHandle.NoteView))
+	mux.Handle("/note/delete", handlers.HandleWithError(noteHandle.NoteDelete))
+
 	mux.HandleFunc("/note/create", noteHandle.NoteCreate)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux); err != nil {
