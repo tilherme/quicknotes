@@ -18,7 +18,7 @@
     </div>
     <div class="buttons">
         <button class="success" type="submit">Salvar</button>
-        <button class="neutral" type="submit">Cancelar</button>
+        <button class="neutral" type="button">Cancelar</button>
     </div>
 </form>
 {{ end }}
@@ -30,6 +30,9 @@
         $(".color").removeClass("active")
         $(this).addClass("active")
         $("#color").val($(this).data("color"))
+    })
+    $("button.neutral").click(function(){
+        window.location.href = "/"
     })
 
 </script>

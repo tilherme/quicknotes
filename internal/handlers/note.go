@@ -120,3 +120,28 @@ func (nh *noteHandle) NoteCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, fmt.Sprintf("/note/view?id=%d", note.Id.Int), http.StatusSeeOther)
 }
+
+func (nh *noteHandle) NoteDelete(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodDelete {
+		w.Header().Set("Allow", http.MethodDelete)
+		// w.WriteHeader(405) //  só pode ser chamado 1 vez por request
+		// fmt.Fprint(w, "Metodo não permitido") // opcional o corpo pode ir vazio
+		// errors.New("deu ruim")
+		http.Error(w, "Metodo não permitido", http.StatusMethodNotAllowed) // substitui a mensagem e o code
+	}
+	idParam := r.URL.Query().Get("id")
+
+	if idParam == "" {
+		return customerror.WithStatus(errors.New("anotação é obrigatoria"), http.StatusBadRequest)
+	}
+	id, err := strconv.Atoi(idParam)
+
+	if err != nil {
+		return err
+	}
+	err = nh.repo.Delete(r.Context(), id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
