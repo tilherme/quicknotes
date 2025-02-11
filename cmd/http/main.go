@@ -31,13 +31,13 @@ func main() {
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
 	noteHandle := handlers.NewNoteHandle(noteRepo)
-
-	mux.HandleFunc("/", noteHandle.NoteList)
-	mux.HandleFunc("/note/new", noteHandle.NoteNew)
+	mux.Handle("/", handlers.HandleWithError(noteHandle.NoteList))
+	mux.Handle("/note/new", handlers.HandleWithError(noteHandle.NoteNew))
 	mux.Handle("/note/view", handlers.HandleWithError(noteHandle.NoteView))
 	mux.Handle("/note/delete", handlers.HandleWithError(noteHandle.NoteDelete))
+	mux.Handle("/note/edit", handlers.HandleWithError(noteHandle.NoteEdit))
 
-	mux.HandleFunc("/note/create", noteHandle.NoteCreate)
+	mux.Handle("/note/save", handlers.HandleWithError(noteHandle.NoteSave))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux); err != nil {
 		panic(err)
