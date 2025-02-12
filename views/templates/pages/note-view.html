@@ -5,7 +5,7 @@
     <h3>Esta é a nota {{ .Title }}</h3>
     <p>{{.Content}}</p>
     <div class="buttons">
-        <button class="info" type="button">Editar</button>
+        <button data-noteid="{{.Id}}" class="info" type="button">Editar</button>
         <button data-noteid="{{.Id}}" class="danger" type="button">Deletar</button>
     </div>
 </div>
@@ -28,6 +28,10 @@
         })
        }
     });
+    $("button.info").click(function(event) {
+        window.location.href = "/note/edit?id=" + $(this).data("noteid")
+    })
+
     
 </script>
 {{end}}

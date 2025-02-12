@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitgub.com/tilherme/quicknotes/internal/models"
+	"gitgub.com/tilherme/quicknotes/internal/validators"
 )
 
 type NoteResponse struct {
@@ -18,12 +19,21 @@ type NoteRequest struct {
 	Content string
 	Color   string
 	Colors  []string
+	validators.FormValidation
 }
 
-func newRequestNote() (req NoteRequest) {
-	req.Color = "color3"
+func newRequestNote(note *models.Note) (req NoteRequest) {
 	for i := 1; i <= 9; i++ {
 		req.Colors = append(req.Colors, fmt.Sprintf("color%d", i))
+	}
+	if note != nil {
+		req.Id = int(note.Id.Int.Int64())
+		req.Title = note.Title.String
+		req.Content = note.Content.String
+		req.Color = note.Color.String
+
+	} else {
+		req.Color = "color3"
 	}
 	return
 }

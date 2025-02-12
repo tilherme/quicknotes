@@ -3,11 +3,25 @@
 {{ define "main" }}
 <h1>Nova anotação</h1>
 <p>Formulário de criação de uma nova anotação...</p>
-<form action="/note/create" method="post">
+<form action="/note/save" method="post">
+    {{with .FieldErros}}
+    <ul class="errors">
+        {{range .}}
+           <li> {{.}} </li>
+        {{end}}
+    </ul>
+    {{end}}
     <label for="title"> Titulo</label>
-    <input type="text" name="title">
+    <input required type="text" name="title" value="{{.Title}}">
+
     <label for="content">Conteudo</label>
-    <textarea name="content" col="30" rows="10"></textarea>
+    {{with .FieldErros.content}}
+        <label class="error">{{.}}</label>
+    {{end}}
+
+    <textarea required name="content" col="30" rows="10">
+        {{- .Content -}}
+    </textarea>
     <label for="cor">Cor</label>
     <input id="color" type="hidden" name="color" value="{{.Color}}">
     <div class="color-picker">
