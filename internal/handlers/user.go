@@ -10,5 +10,5 @@ func NewUserHandler() *UserHandler {
 }
 
 func (uh *UserHandler) Signup(w http.ResponseWriter, r *http.Request) error {
-	return render(w, http.StatusOK, "create-user.html", nil)
+	return render(w, http.StatusOK, "signup.html", nil)
 }
