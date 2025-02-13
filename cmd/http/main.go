@@ -23,7 +23,6 @@ func main() {
 	}
 	slog.Info("Conexão feita com sucesso")
 	defer dbpool.Close()
-
 	mux := http.NewServeMux()
 
 	noteRepo := repositories.NewNote(dbpool)
@@ -31,12 +30,14 @@ func main() {
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
 	noteHandle := handlers.NewNoteHandle(noteRepo)
+	userhandle := handlers.NewUserHandler()
+
 	mux.Handle("/", handlers.HandleWithError(noteHandle.NoteList))
 	mux.Handle("/note/new", handlers.HandleWithError(noteHandle.NoteNew))
 	mux.Handle("/note/view", handlers.HandleWithError(noteHandle.NoteView))
 	mux.Handle("/note/delete", handlers.HandleWithError(noteHandle.NoteDelete))
 	mux.Handle("/note/edit", handlers.HandleWithError(noteHandle.NoteEdit))
-
+	mux.Handle("/user/signup", handlers.HandleWithError(userhandle.Signup))
 	mux.Handle("/note/save", handlers.HandleWithError(noteHandle.NoteSave))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux); err != nil {
