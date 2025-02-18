@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"gitgub.com/tilherme/quicknotes/internal/repositories"
+	"gitgub.com/tilherme/quicknotes/utils"
 )
 
 type UserHandle struct {
@@ -47,7 +48,12 @@ func (uh *UserHandle) Signup(w http.ResponseWriter, r *http.Request) error {
 		render(w, http.StatusUnprocessableEntity, "signup.html", data)
 		return nil
 	}
-	user, err := uh.repo.Create(r.Context(), data.Email, data.Password, data.Name)
+	fmt.Println("Senha invalida")
+	hash, err := utils.GenerateFromPassword(data.Password)
+	if err != nil {
+		return err
+	}
+	user, err := uh.repo.Create(r.Context(), data.Email, hash, data.Name)
 	if err == repositories.ErrDuplicateEmail {
 		data.AddFieldErrors("email", "Email, ja esta em uso")
 		return render(w, http.StatusUnprocessableEntity, "signup.html", data)

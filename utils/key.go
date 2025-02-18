@@ -1,15 +1,9 @@
-package main
+package utils
 
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 )
-
-func main() {
-	fmt.Println(GenerateToken())
-
-}
 
 func GenerateToken() string {
 	r := make([]byte, 32)
