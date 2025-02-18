@@ -26,12 +26,13 @@ func main() {
 	mux := http.NewServeMux()
 
 	noteRepo := repositories.NewNote(dbpool)
+	userRepo := repositories.NewUser(dbpool)
 	staticHandler := http.FileServer(http.Dir("views/static"))
 
 	mux.Handle("/static/", http.StripPrefix("/static/", staticHandler))
 
 	noteHandle := handlers.NewNoteHandle(noteRepo)
-	userhandle := handlers.NewUserHandler()
+	userhandle := handlers.NewUserHandler(userRepo)
 
 	mux.Handle("/", handlers.HandleWithError(noteHandle.NoteList))
 	mux.Handle("/note/new", handlers.HandleWithError(noteHandle.NoteNew))
