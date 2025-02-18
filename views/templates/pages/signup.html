@@ -1,38 +1,45 @@
-{{ define "title" }}Novo usuario{{end}}
+{{ define "title" }}Novo cadastro{{end}}
 
 {{ define "main" }}
-<form class="user-form" action="/user/signup" method="post"></form>
+<form class="user-form" action="/user/signup" method="post">
     <h1>Cadastrar-se</h1>
-    {{with .FieldErrors}}
+    
+    {{with .FieldErros}}
     <ul class="errors">
         {{range .}}
-        <li>{{.}}</li>
+           <li> {{.}} </li>
         {{end}}
     </ul>
     {{end}}
+        
     <label for="email">E-mail</label>
     <input name="email" type="text" id="email">
+    
+    <label for="name">Nome</label>
+    <input  type="text" name="name" id="name">
 
     <label for="password">Senha</label>
-    <input type="password" name="password" id="password">
-    <input type="checkbox"><span>Mostrar senha</span>
-    <!-- <label for="answer">Resposta</label> -->
-    <!-- <input required autocomplete="off" name="answer" type="text" id="answer"> -->
+    <input  type="password" name="password" id="password">
 
+    <input type="checkbox"><span>Mostrar senha</span>
+
+    
     <button class="success" type="submit">Cadastrar</button>
 
     <p>Já é cadastrado? <a href="/user/signin">Faça o Login</a></p>
 </form>
-{{ end }}
+{{end}}
 
 {{define "script"}}
 <script>
     $(":checkbox").click(function () {
         if ($(this).is(":checked")) {
+            console.log("clicouuuu ----")
             $("#password").attr("type", "text")
         } else {
             $("#password").attr("type", "password")
         }
     })
-    </script>
+
+</script>
 {{end}}

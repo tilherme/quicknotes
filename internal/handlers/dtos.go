@@ -21,6 +21,19 @@ type NoteRequest struct {
 	Colors  []string
 	validators.FormValidation
 }
+type UserRequest struct {
+	Email    string
+	Password string
+	Name     string
+	validators.FormValidation
+}
+
+func newUserRequest(email, password, name string) (req UserRequest) {
+	req.Email = email
+	req.Password = password
+	req.Name = name
+	return
+}
 
 func newRequestNote(note *models.Note) (req NoteRequest) {
 	for i := 1; i <= 9; i++ {

@@ -14,7 +14,7 @@ func render(w http.ResponseWriter, status int, page string, data any) error {
 	files = append(files, "views/templates/pages/"+page)
 	t, err := template.ParseFiles(files...)
 	if err != nil {
-		return errors.New("aconteceu um erro ao executar essa pagina")
+		return errors.New(err.Error())
 	}
 	if err != nil {
 		return err
