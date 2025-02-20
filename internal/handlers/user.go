@@ -48,12 +48,12 @@ func (uh *UserHandle) Signup(w http.ResponseWriter, r *http.Request) error {
 		render(w, http.StatusUnprocessableEntity, "signup.html", data)
 		return nil
 	}
-	fmt.Println("Senha invalida")
 	hash, err := utils.GenerateFromPassword(data.Password)
 	if err != nil {
 		return err
 	}
-	user, err := uh.repo.Create(r.Context(), data.Email, hash, data.Name)
+	hashToken := utils.GenerateToken()
+	user, token, err := uh.repo.Create(r.Context(), data.Email, hash, data.Name, hashToken)
 	if err == repositories.ErrDuplicateEmail {
 		data.AddFieldErrors("email", "Email, ja esta em uso")
 		return render(w, http.StatusUnprocessableEntity, "signup.html", data)
@@ -62,8 +62,9 @@ func (uh *UserHandle) Signup(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(token)
 	fmt.Println(user.Email)
-	return render(w, http.StatusOK, "signup-sucess.html", nil)
+	return render(w, http.StatusOK, "signup-sucess.html", token)
 }
 
 func isEmailValid(e string) bool {
