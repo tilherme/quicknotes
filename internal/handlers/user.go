@@ -71,3 +71,13 @@ func isEmailValid(e string) bool {
 	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	return emailRegex.MatchString(e)
 }
+
+func (uh *UserHandle) Confirm(w http.ResponseWriter, r *http.Request) error {
+	token := r.PathValue("token")
+	err := uh.repo.ConfirmUserByToken(r.Context(), token)
+	msg := "Cadastro realizado com sucesso"
+	if err != nil {
+		msg = "Token invalido ou cadastro já confirmado"
+	}
+	return render(w, http.StatusOK, "user-confirm.html", msg)
+}
