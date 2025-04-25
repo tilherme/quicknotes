@@ -10,27 +10,61 @@ import (
 
 type HandleWithError func(w http.ResponseWriter, r *http.Request) error
 
+type responseWriterWrapper struct {
+	http.ResponseWriter
+	wroteHeader bool
+}
+
+func (rw *responseWriterWrapper) WriteHeader(statusCode int) {
+	if !rw.wroteHeader {
+		rw.ResponseWriter.WriteHeader(statusCode)
+		rw.wroteHeader = true
+	}
+}
+
+func (rw *responseWriterWrapper) Write(b []byte) (int, error) {
+	if !rw.wroteHeader {
+		rw.WriteHeader(http.StatusOK)
+	}
+	return rw.ResponseWriter.Write(b)
+}
+
 func (f HandleWithError) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := f(w, r); err != nil {
+	rw := &responseWriterWrapper{ResponseWriter: w}
+
+	if err := f(rw, r); err != nil {
 		var statusErr customerror.StatusError
+
 		if errors.As(err, &statusErr) {
 			if statusErr.StatusCode() == http.StatusNotFound {
 				files := []string{
 					"../../views/templates/base.html",
 					"../../views/templates/pages/404.html",
 				}
-				t, err := template.ParseFiles(files...)
-				if err != nil {
-					http.Error(w, err.Error(), statusErr.StatusCode())
+
+				t, tmplErr := template.ParseFiles(files...)
+				if tmplErr != nil {
+					if !rw.wroteHeader {
+						http.Error(rw, tmplErr.Error(), http.StatusInternalServerError)
+					}
+					return
 				}
-				t.ExecuteTemplate(w, "base", statusErr.Error())
+
+				if !rw.wroteHeader {
+					rw.WriteHeader(http.StatusNotFound)
+				}
+				t.ExecuteTemplate(rw, "base", statusErr.Error())
 				return
 			}
-			http.Error(w, err.Error(), statusErr.StatusCode())
+
+			if !rw.wroteHeader {
+				http.Error(rw, err.Error(), statusErr.StatusCode())
+			}
 			return
-
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 
+		if !rw.wroteHeader {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
