@@ -39,11 +39,14 @@ func main() {
 	mux.Handle("/note/view", handlers.HandleWithError(noteHandle.NoteView))
 	mux.Handle("/note/delete", handlers.HandleWithError(noteHandle.NoteDelete))
 	mux.Handle("/note/edit", handlers.HandleWithError(noteHandle.NoteEdit))
+	mux.Handle("/note/save", handlers.HandleWithError(noteHandle.NoteSave))
+
 	mux.Handle("GET /user/signup", handlers.HandleWithError(userhandle.SignupForm))
 	mux.Handle("POST /user/signup", handlers.HandleWithError(userhandle.Signup))
 	mux.Handle("GET /confirmation/{token}", handlers.HandleWithError(userhandle.Confirm))
-	mux.Handle("/note/save", handlers.HandleWithError(noteHandle.NoteSave))
 
+	mux.Handle("GET /user/signin", handlers.HandleWithError(userhandle.SigninForm))
+	mux.Handle("POST /user/signin", handlers.HandleWithError(userhandle.Signin))
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux); err != nil {
 		panic(err)
 	}

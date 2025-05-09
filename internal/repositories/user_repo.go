@@ -18,6 +18,7 @@ var ErrInvalidToken = newRepoErro(errors.New("invalid token or user already conf
 type UserRepo interface {
 	Create(ctx context.Context, email, password, name, hashKey string) (*models.User, string, error)
 	ConfirmUserByToken(ctx context.Context, token string) error
+	FindByEmail(ctx context.Context, email string) (*models.User, error)
 }
 type userRepo struct {
 	db *pgxpool.Pool
@@ -91,4 +92,17 @@ func (ur *userRepo) ConfirmUserByToken(ctx context.Context, token string) error 
 		return newRepoErro(err)
 	}
 	return nil
+}
+
+func (ur *userRepo) FindByEmail(ctx context.Context, email string) (*models.User, error) {
+	var user models.User
+	query := `SELECT id, email, password, active FROM users WHERE email = $1`
+	row := ur.db.QueryRow(ctx, query, email)
+	if err := row.Scan(&user.Id, &user.Email, &user.Password, &user.Active); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, newRepoErro(err)
+		}
+		return nil, newRepoErro(err)
+	}
+	return &user, nil
 }

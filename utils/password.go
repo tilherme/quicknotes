@@ -13,3 +13,9 @@ func GenerateFromPassword(password string) (string, error) {
 	}
 	return string(hash), nil
 }
+
+func ValidatePassword(password, hashPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(password))
+
+	return err == nil
+}

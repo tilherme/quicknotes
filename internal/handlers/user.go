@@ -17,7 +17,51 @@ type UserHandle struct {
 func NewUserHandler(repo repositories.UserRepo) *UserHandle {
 	return &UserHandle{repo: repo}
 }
+func (uh *UserHandle) SigninForm(w http.ResponseWriter, r *http.Request) error {
+	return render(w, http.StatusOK, "signin.html", nil)
+}
+func (uh *UserHandle) Signin(w http.ResponseWriter, r *http.Request) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+	email := r.PostFormValue("email")
+	password := r.PostFormValue("password")
+	name := r.PostFormValue("name")
+	data := newUserRequest(email, password, name)
+	data.Email = email
+	data.Password = password
+	data.Name = name
 
+	if strings.TrimSpace(data.Password) == "" {
+		data.AddFieldErrors("password", "Senha é obrigatorio")
+	}
+
+	if !isEmailValid(data.Email) {
+		data.AddFieldErrors("email", "Email é invalido")
+	}
+	if !data.Valid() {
+		render(w, http.StatusUnprocessableEntity, "signin.html", data)
+		return nil
+	}
+
+	user, err := uh.repo.FindByEmail(r.Context(), data.Email)
+	if err != nil {
+		data.AddFieldErrors("email", "Credenciais invalidas")
+		return render(w, http.StatusUnprocessableEntity, "signin.html", data)
+	}
+	if !utils.ValidatePassword(data.Password, user.Password.String) {
+		data.AddFieldErrors("email", "Credenciais invalidas")
+		return render(w, http.StatusUnprocessableEntity, "signin.html", data)
+	}
+	if !user.Active.Bool {
+		data.AddFieldErrors("email", "Email não confirmado")
+		return render(w, http.StatusUnprocessableEntity, "signin.html", data)
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	return nil
+}
 func (uh *UserHandle) SignupForm(w http.ResponseWriter, r *http.Request) error {
 	return render(w, http.StatusOK, "signup.html", nil)
 }
