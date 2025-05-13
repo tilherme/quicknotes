@@ -45,6 +45,8 @@ func main() {
 	mux.Handle("POST /user/signup", handlers.HandleWithError(userhandle.Signup))
 	mux.Handle("GET /confirmation/{token}", handlers.HandleWithError(userhandle.Confirm))
 
+	mux.Handle("GET /me", handlers.HandleWithError(userhandle.Me))
+
 	mux.Handle("GET /user/signin", handlers.HandleWithError(userhandle.SigninForm))
 	mux.Handle("POST /user/signin", handlers.HandleWithError(userhandle.Signin))
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.ServerPort), mux); err != nil {

@@ -20,6 +20,16 @@ func NewUserHandler(repo repositories.UserRepo) *UserHandle {
 func (uh *UserHandle) SigninForm(w http.ResponseWriter, r *http.Request) error {
 	return render(w, http.StatusOK, "signin.html", nil)
 }
+func (uh *UserHandle) Me(w http.ResponseWriter, r *http.Request) error {
+	session, err := r.Cookie("session")
+	if err != nil {
+		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+		return nil
+	}
+	fmt.Fprintf(w, "Email: %s", session.Value)
+	return nil
+
+}
 func (uh *UserHandle) Signin(w http.ResponseWriter, r *http.Request) error {
 	err := r.ParseForm()
 	if err != nil {
@@ -58,7 +68,13 @@ func (uh *UserHandle) Signin(w http.ResponseWriter, r *http.Request) error {
 		data.AddFieldErrors("email", "Email não confirmado")
 		return render(w, http.StatusUnprocessableEntity, "signin.html", data)
 	}
-
+	session := http.Cookie{
+		Name:     "session",
+		Value:    user.Email.String,
+		Path:     "/",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &session)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	return nil
 }
